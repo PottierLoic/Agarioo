@@ -13,11 +13,22 @@ from constants import *
 
 def graphics():
     canvas.delete("blob", "player")
-    for blob in blobs:
-        canvas.create_oval(blob.posx - blob.value/2, blob.posy - blob.value/2, blob.posx + blob.value/2 , blob.posy + blob.value/2, fill="white", tag="blob")
     for player in players:
+        # calculate the dimension/position of the player
         radius = player.value/2
-        canvas.create_oval(player.posx - radius, player.posy - radius, player.posx + radius, player.posy + radius, fill="red", tag="player")
+        px0 = player.posx - radius
+        py0 = player.posy - radius
+        px1 = player.posx + radius
+        py1 = player.posy + radius
+        canvas.create_oval(px0, py0, px1, py1, fill=player.color, tag="player", outline=player.color)
+        canvas.create_text(player.posx, player.posy, text=player.name, fill="black", tag="player")
+    for blob in blobs:
+        # calculate the dimension/position of the blob
+        bx0 = blob.posx - blob.value/2
+        by0 = blob.posy - blob.value/2
+        bx1 = blob.posx + blob.value/2
+        by1 = blob.posy + blob.value/2
+        canvas.create_oval(bx0, by0, bx1, by1, fill=blob.color, tag="blob", outline=blob.color)
     
 def mousePosition():
     mousex = window.winfo_pointerx() - window.winfo_rootx()
@@ -25,15 +36,12 @@ def mousePosition():
     angle = math.atan2(mousey - players[0].posy, mousex - players[0].posx)
     players[0].direction = (math.cos(angle), math.sin(angle))
 
-# TODO: fix collision detection (actually it check collision like if the player and blobs were squares) 
-#       and collision box increase faster than the real size of the player
 def collide():
     for player in players:
         for b in blobs:
-            if math.sqrt((player.posx - b.posx)**2 + (player.posy - b.posy)**2) < player.value + b.value:
-                if player.value > b.value:
-                    player.value += b.value
-                    blobs.remove(b)
+            if player.value/2 + b.value/2 >= math.sqrt((b.posx - player.posx)**2 + (b.posy - player.posy)**2):
+                player.eat(b.value)
+                blobs.remove(b)
 
 def update():
     global timeCount
@@ -48,16 +56,11 @@ def update():
     graphics()
     window.after(PLAYER_SPEED, update)
 
-
 if __name__ == "__main__":
-
     # WINDOW AND TKINTER SECTION
     window = Tk()
     window.title("Agar.io")
     window.resizable(False, False)
-
-    label = Label(window, text="Agar.io", font=("consolas", 10))
-    label.pack()
 
     canvas = Canvas(window, bg=BACKGROUND_COLOR, height=HEIGHT, width=WIDTH)
     canvas.pack()
@@ -85,8 +88,8 @@ if __name__ == "__main__":
     blobs = []
     for i in range(10):
         blobs.append(blob.Blob())
-    for i in range(1):
-        players.append(player.Player("name"))
+    for i in range(10):
+        players.append(player.Player("Loic UWU"))
 
     update()
     graphics()
