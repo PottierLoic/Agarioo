@@ -14,7 +14,7 @@ from constants import *
 def graphics():
     canvas.delete("blob", "player")
     for player in players:
-        # calculate the dimension/position of the player
+        # calculate the dimension/position of the players and draw them
         radius = player.value/2
         px0 = player.posx - radius
         py0 = player.posy - radius
@@ -23,7 +23,7 @@ def graphics():
         canvas.create_oval(px0, py0, px1, py1, fill=player.color, tag="player", outline=player.color)
         canvas.create_text(player.posx, player.posy, text=player.name, fill="black", tag="player")
     for blob in blobs:
-        # calculate the dimension/position of the blob
+        # calculate the dimension/position of the blobs and draw them
         bx0 = blob.posx - blob.value/2
         by0 = blob.posy - blob.value/2
         bx1 = blob.posx + blob.value/2
