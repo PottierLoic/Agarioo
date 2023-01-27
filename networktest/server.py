@@ -6,7 +6,12 @@
 import socket
 import _thread
 import sys
+import pickle
 
+# FILE IMPORTS
+from game import Game
+
+# NETWORK SECTION
 server = "192.168.0.10"
 port = 5555
 
@@ -22,17 +27,19 @@ s.listen(2)
 print("waiting for a connection, server started")
 
 def threaded_client(conn):
-    conn.send(str.encode("Connected"))
+    global game
+    conn.send(pickle.dumps(game.players))
     reply = ""
     while True:
         try:
-            data = conn.recv(2048)
-            reply = data.decode("utf-8")
+            data = pickle.loads(conn.recv(2048))
+            direction = (data[0], data[1])
+            name = data[2]
             if not data:
                 print("Disconnected")
                 break
             else:
-                print("Received: ", reply)
+                print("Received: ", data)
                 print("Sending: ", reply)
             conn.sendall(str.encode(reply))
         except :
@@ -41,9 +48,12 @@ def threaded_client(conn):
     print("Lost connection")
     conn.close()
 
+if __name__ == "__main__":
 
-while True:
-    conn, addr = s.accept()
-    print("connected to: ", addr)
+    game = Game()
 
-    _thread.start_new_thread(threaded_client, (conn,))
+    while True:
+        conn, addr = s.accept()
+        print("connected to: ", addr)
+
+        _thread.start_new_thread(threaded_client, (conn,))
