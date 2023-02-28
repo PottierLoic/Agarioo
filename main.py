@@ -7,54 +7,32 @@ import math
 from tkinter import *
 
 # FILES IMPORTS
-import blob
-import player
+from game import Game
 from constants import *
 
 def graphics():
-    canvas.delete("blob", "player")
-    for player in players:
-        # calculate the dimension/position of the players and draw them
-        radius = player.value/2
-        px0 = player.posx - radius
-        py0 = player.posy - radius
-        px1 = player.posx + radius
-        py1 = player.posy + radius
-        canvas.create_oval(px0, py0, px1, py1, fill=player.color, tag="player", outline=player.color)
-        canvas.create_text(player.posx, player.posy, text=player.name, fill="black", tag="player")
-    for blob in blobs:
-        # calculate the dimension/position of the blobs and draw them
-        bx0 = blob.posx - blob.value/2
-        by0 = blob.posy - blob.value/2
-        bx1 = blob.posx + blob.value/2
-        by1 = blob.posy + blob.value/2
-        canvas.create_oval(bx0, by0, bx1, by1, fill=blob.color, tag="blob", outline=blob.color)
-    
+    canvas.delete("all")
+    for p in g.players:
+        # calculate the dimension/position of the g.players and draw them
+        canvas.create_oval(p.x - p.radius, p.y - p.radius, p.x + p.radius, p.y + p.radius, fill=p.color, tag="player", outline=p.color)
+        canvas.create_text(p.x, p.y, text=p.name, fill="black", tag="player")
+    for b in g.blobs:
+        # calculate the dimension/position of the g.blobs and draw them
+        canvas.create_oval(b.x - b.radius, b.y - b.radius, b.x + b.radius, b.y + b.radius, fill=b.color, tag="blob", outline=b.color)
+    if RECT_DISPLAY:
+        g.qtree.draw(canvas)
+
 def mousePosition():
     mousex = window.winfo_pointerx() - window.winfo_rootx()
     mousey = window.winfo_pointery() - window.winfo_rooty()
-    angle = math.atan2(mousey - players[0].posy, mousex - players[0].posx)
-    players[0].direction = (math.cos(angle), math.sin(angle))
-
-def collide():
-    for player in players:
-        for b in blobs:
-            if player.value/2 + b.value/2 >= math.sqrt((b.posx - player.posx)**2 + (b.posy - player.posy)**2):
-                player.eat(b.value)
-                blobs.remove(b)
+    angle = math.atan2(mousey - g.players[0].y, mousex - g.players[0].x)
+    g.players[0].direction = (math.cos(angle), math.sin(angle))
 
 def update():
-    global timeCount
     mousePosition()
-    timeCount+=1
-    if timeCount == max:
-        blobs.append(blob.Blob())
-        timeCount = 0
-    for player in players:
-        player.updatePosition()
-    collide()
+    g.update()
     graphics()
-    window.after(PLAYER_SPEED, update)
+    window.after(DELAY, update)
 
 if __name__ == "__main__":
     # WINDOW AND TKINTER SECTION
@@ -68,21 +46,10 @@ if __name__ == "__main__":
     window.update()
 
     # VARIABLES
+    g = Game()
     mousex = 0
     mousey = 0
-    timeCount = 0
-    max = int(SPAWN_RATE / PLAYER_SPEED)
-
-    # GAME SECTION
-    players = []
-    blobs = []
-    for i in range(10):
-        blobs.append(blob.Blob())
-    for i in range(10):
-        players.append(player.Player("Loic UWU"))
 
     update()
-    graphics()
-
 
     window.mainloop()

@@ -4,16 +4,16 @@
 
 # IMPORTS
 import random
+import math
 
 # FILES IMPORTS
 from constants import *
 
 class Blob:
     def __init__(self) -> None:
-        self.posx = random.randint(0, WIDTH)
-        self.posy = random.randint(0, HEIGHT)
-        self.value = random.randint(BLOB_MIN_SIZE, BLOB_MAX_SIZE)
+        self.type = "blob"
+        self.x = random.randint(0, WIDTH)
+        self.y = random.randint(0, HEIGHT)
+        self.mass = random.uniform(BLOB_MIN_MASS, BLOB_MAX_MASS)
+        self.radius = math.sqrt(self.mass*100)
         self.color = random.choice(BLOB_COLORS)
-
-    def __str__(self) -> str:
-        return f"Blob({self.posx}, {self.posy}, {self.value})"
