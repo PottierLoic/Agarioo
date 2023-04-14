@@ -18,10 +18,10 @@ class Game():
     def __init__(self) -> None:
         self.blobs = []
         self.players = []
-        for blob in range(10):
+        for _ in range(10):
             self.blobs.append(Blob())
-        for player in range(10):
-            self.players.append(Player("loic uwu"))
+        for i in range(10):
+            self.players.append(Player("Player "+str(i)))
         self.prevTime = 0
         self.lastTime = 0
         self.respawnDelay = 20
@@ -37,13 +37,22 @@ class Game():
         for player in self.players:
             self.qtree.query(Rect(player.x, player.y, player.radius+50, player.radius+50), nearby)
             for obj in nearby:
-                if obj.type == "blob":
-                    if player.radius + obj.radius >= math.sqrt((obj.x - player.x)**2 + (obj.y - player.y)**2):
-                        player.eat(obj.mass)
-                        try:
-                            self.blobs.remove(obj)
-                        except:
-                            pass
+                if obj != self :
+                    if obj.type == "blob":
+                        if player.radius + obj.radius >= math.sqrt((obj.x - player.x)**2 + (obj.y - player.y)**2):
+                            player.eat(obj.mass)
+                            try:
+                                self.blobs.remove(obj)
+                            except:
+                                pass
+                    else:
+                        if (player.radius + obj.radius)*0.5 >= math.sqrt((obj.x - player.x)**2 + (obj.y - player.y)**2) and player.mass > obj.mass:
+                            player.eat(obj.mass)
+                            try:
+                                self.players.remove(obj)
+                            except:
+                                pass
+        
     def update(self):
         if self.prevTime < PHYSICS_REFRESH_RATE:
             self.prevTime += time.time() - self.lastTime
@@ -56,5 +65,7 @@ class Game():
             self.collide()
             self.respawnDelay += 1
             self.prevTime = 0
+            self.players.sort(key=lambda p:p.mass, reverse=False)
         lastTime = time.time
+
 
