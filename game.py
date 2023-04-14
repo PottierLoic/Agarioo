@@ -21,7 +21,7 @@ class Game():
         for _ in range(10):
             self.blobs.append(Blob())
         for i in range(10):
-            self.players.append(Player("Player "+str(i)))
+            self.players.append(Player("Player "+str(i), True))
         self.prevTime = 0
         self.lastTime = 0
         self.respawnDelay = 20
@@ -53,6 +53,13 @@ class Game():
                             except:
                                 pass
         
+    def newPlayer(self, name) -> int:
+        for player in self.players:
+            if player.name == name:
+                return -1
+        self.players.append(Player(name, False))
+
+
     def update(self):
         if self.prevTime < PHYSICS_REFRESH_RATE:
             self.prevTime += time.time() - self.lastTime
@@ -66,6 +73,6 @@ class Game():
             self.respawnDelay += 1
             self.prevTime = 0
             self.players.sort(key=lambda p:p.mass, reverse=False)
-        lastTime = time.time
+        self.lastTime = time.time()
 
 

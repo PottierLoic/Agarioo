@@ -23,10 +23,14 @@ def graphics():
         g.qtree.draw(canvas)
 
 def mousePosition():
-    mousex = window.winfo_pointerx() - window.winfo_rootx()
-    mousey = window.winfo_pointery() - window.winfo_rooty()
-    angle = math.atan2(mousey - g.players[0].y, mousex - g.players[0].x)
-    g.players[0].direction = (math.cos(angle), math.sin(angle))
+    for i in range(len(g.players)):
+        if g.players[i].name == "loic":
+            mousex = window.winfo_pointerx() - window.winfo_rootx()
+            mousey = window.winfo_pointery() - window.winfo_rooty()
+            angle = math.atan2(mousey - g.players[i].y, mousex - g.players[i].x)
+            g.players[i].direction = angle
+            break
+    
 
 def update():
     mousePosition()
@@ -47,6 +51,8 @@ if __name__ == "__main__":
 
     # VARIABLES
     g = Game()
+    g.newPlayer("loic")
+
     mousex = 0
     mousey = 0
 
